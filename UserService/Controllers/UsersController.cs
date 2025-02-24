@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.Data;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using UserService.Models;
 using UserService.Utilities;
@@ -22,6 +23,7 @@ namespace UserService.Controllers
 			_jwtTokenGenerator=jwtTokenGenerator;
 		}
 
+		[Authorize]
 		[HttpGet("{id}")]
 		public IActionResult GetByd(int id)
 		{

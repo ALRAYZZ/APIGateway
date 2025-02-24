@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ProductService.Models;
 using System.Net.NetworkInformation;
 
@@ -6,6 +7,7 @@ namespace ProductService.Controllers
 {
 	[ApiController]
 	[Route("api/[controller]")]
+	[Authorize]
 	public class ProductsController : ControllerBase
 	{
 		private static readonly List<ProductModel> Products = new()

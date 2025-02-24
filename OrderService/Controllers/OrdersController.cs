@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using OrderService.Models;
 using System.Net.NetworkInformation;
 
@@ -6,6 +7,7 @@ namespace OrderService.Controllers
 {
 	[ApiController]
 	[Route("api/[controller]")]
+	[Authorize]
 	public class OrdersController : ControllerBase
 	{
 		private static readonly List<OrderModel> Orders = new();
