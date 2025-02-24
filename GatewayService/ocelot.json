@@ -1,6 +1,6 @@
 {
   "Routes": [
-    // Product Service Routes
+    // Product Service Routes (Authenticated + Rate Limited)
     {
       "DownstreamPathTemplate": "/api/products",
       "DownstreamScheme": "http",
@@ -11,7 +11,18 @@
         }
       ],
       "UpstreamPathTemplate": "/gateway/products",
-      "UpstreamHttpMethod": [ "Get" ]
+      "UpstreamHttpMethod": [ "Get" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
+      "RateLimitOptions": {
+        "ClientWhitelist": [],
+        "EnableRateLimiting": true,
+        "Period": "1m",
+        "PeriodTimespan": 60,
+        "Limit": 100
+      }
     },
     {
       "DownstreamPathTemplate": "/api/products/{id}",
@@ -23,9 +34,20 @@
         }
       ],
       "UpstreamPathTemplate": "/gateway/products/{id}",
-      "UpstreamHttpMethod": [ "Get" ]
+      "UpstreamHttpMethod": [ "Get" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
+      "RateLimitOptions": {
+        "ClientWhitelist": [],
+        "EnableRateLimiting": true,
+        "Period": "1m",
+        "PeriodTimespan": 60,
+        "Limit": 50
+      }
     },
-    // Order Service Routes
+    // Order Service Routes (Authenticated + Rate Limited)
     {
       "DownstreamPathTemplate": "/api/orders",
       "DownstreamScheme": "http",
@@ -36,9 +58,20 @@
         }
       ],
       "UpstreamPathTemplate": "/gateway/orders",
-      "UpstreamHttpMethod": [ "Get", "Post" ]
+      "UpstreamHttpMethod": [ "Get", "Post" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
+      "RateLimitOptions": {
+        "ClientWhitelist": [],
+        "EnableRateLimiting": true,
+        "Period": "5s",
+        "PeriodTimespan": 5,
+        "Limit": 10
+      }
     },
-    // User Service Routes
+    // User Service Routes (Authenticated for /users/{id}, Open for /login)
     {
       "DownstreamPathTemplate": "/api/users/{id}",
       "DownstreamScheme": "http",
@@ -49,7 +82,11 @@
         }
       ],
       "UpstreamPathTemplate": "/gateway/users/{id}",
-      "UpstreamHttpMethod": [ "Get" ]
+      "UpstreamHttpMethod": [ "Get" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
     },
     {
       "DownstreamPathTemplate": "/api/users/login",
@@ -62,9 +99,16 @@
       ],
       "UpstreamPathTemplate": "/gateway/users/login",
       "UpstreamHttpMethod": [ "Post" ]
+      // No authentication or rate limiting here
     }
   ],
   "GlobalConfiguration": {
-    "BaseUrl": "http://localhost:5000"
+    "BaseUrl": "http://localhost:5000",
+    "RateLimitOptions": {
+      "ClientIdHeader": "Client-Id", // Fallback if no JWT
+      "QuotaExceededMessage": "Rate limit exceeded. Please try again later.",
+      "HttpStatusCode": 429,
+      "DisableRateLimitHeaders": false
+    }
   }
 }
