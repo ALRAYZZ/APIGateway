@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gateway-service
+  template:
+    metadata:
+      labels:
+        app: gateway-service
+    spec:
+      containers:
+      - name: gateway-service
+        image: gateway-service:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: logs
+          mountPath: /app/logs
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: "Development"
+      volumes:
+      - name: logs
+        emptyDir: {} # Temporary storage for logs in pod
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway-service
+spec:
+  selector:
+    app: gateway-service
+  ports:
+  - port: 80
+    targetPort: 80
+  type: LoadBalancer
