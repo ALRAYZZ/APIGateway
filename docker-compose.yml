@@ -1,0 +1,54 @@
+services:
+  gateway-service:
+    build:
+      context: ./GatewayService
+      dockerfile: Dockerfile
+    ports:
+      - "5000:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    volumes:
+      - ./GatewayService/logs:/app/logs
+    depends_on:
+      - product-service
+      - order-service
+      - user-service
+    networks:
+      - app-network
+
+  product-service:
+    build:
+      context: ./ProductService
+      dockerfile: Dockerfile
+    ports:
+      - "5001:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    networks:
+      - app-network
+
+  order-service:
+    build:
+      context: ./OrderService
+      dockerfile: Dockerfile
+    ports:
+      - "5002:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    networks:
+      - app-network
+
+  user-service:
+    build:
+      context: ./UserService
+      dockerfile: Dockerfile
+    ports:
+      - "5003:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

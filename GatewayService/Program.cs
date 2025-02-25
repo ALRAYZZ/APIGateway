@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
+using Serilog;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +12,24 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
+// Configure Serilog
+builder.Host.UseSerilog((context, services, configuration) =>
+{
+	configuration
+		.ReadFrom.Configuration(context.Configuration)
+		.ReadFrom.Services(services)
+		.Enrich.FromLogContext()
+		.WriteTo.Console()
+		.WriteTo.File(
+			path: "logs/apigateway-.log", // Log to a file with date and time in the name
+			rollingInterval: RollingInterval.Day, // New log file every day
+			retainedFileCountLimit: 7 // Keep logs for 7 days
+			);
+				
+});
+
+
+// JWT authenticationQ
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var keyString = jwtSettings["Key"];
 if (string.IsNullOrEmpty(keyString))
@@ -40,6 +59,10 @@ builder.Services.AddOcelot(builder.Configuration);
 builder.Configuration.AddJsonFile("ocelot.json", optional: false, reloadOnChange: true);
 
 var app = builder.Build();
+
+// Middleware
+app.UseSerilogRequestLogging(); // Log HTTP requests
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
